@@ -1,0 +1,7 @@
+Map(5) {
+  'NonProfit' => 'export interface NonProfit {    id: string,    legalName: string,    EIN: string,    mission: string,    address: Address,    grandSubmissions: GrandSubmission[]}',
+  'GRANDTYPE' => 'export enum GRANDTYPE {    OPERATING_GRANT,    PROJECT_GRANT,    OTHER}',
+  'GrandSubmission' => 'export interface GrandSubmission {    id: string,    nonProfitId: string,    nonProfitName: string,    grandName: string,    requestedAmount: string,    awardedAmount: string,    grandType: GRANDTYPE,    tags: string[],    duration: Duration}',
+  'Address' => 'export interface Address {    street: string,    city: string,    state: string,    zip: string}',
+  'Duration' => 'export interface Duration {    grandStart: string,    grandEnd: string}'
+}
