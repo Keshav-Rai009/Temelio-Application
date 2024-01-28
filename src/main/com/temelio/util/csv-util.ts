@@ -2,7 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 
 
-export class CSVParserUtil {
+export class CSVUtil {
 
     readCSV(csvFilePath: string) {
         const csvFile = path.resolve(__dirname, csvFilePath);

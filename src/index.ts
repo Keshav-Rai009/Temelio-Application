@@ -2,7 +2,7 @@ import { SwaggerModel2TSModelGenerator } from "./main/com/temelio/scripts/swagge
 import { SwaggerSchemaResolver } from "./main/com/temelio/util/swagger-schema-resolver";
 import { NonProfitsUploader } from "./main/com/temelio/scripts/non-profits-uploader";
 import { CSVParser } from "./main/com/temelio/parsers/csv-parser";
-import { CSVParserUtil } from "./main/com/temelio/util/csv-parser-util";
+import { CSVUtil } from "./main/com/temelio/util/csv-util";
 import { HTTPUtil } from "./main/com/temelio/util/http-util";
 
 /**
@@ -13,7 +13,7 @@ import { HTTPUtil } from "./main/com/temelio/util/http-util";
 */
 const TSModels = new SwaggerModel2TSModelGenerator(new SwaggerSchemaResolver()).generateTSModels();
 
-const nonProfitsUploader = new NonProfitsUploader(new CSVParser(new CSVParserUtil()), new HTTPUtil());
+const nonProfitsUploader = new NonProfitsUploader(new CSVParser(new CSVUtil()), new HTTPUtil());
 /**
 * Reads and parses the Non Profits and Grand submissions CSV file and uploads data into the Temelio Server
 */

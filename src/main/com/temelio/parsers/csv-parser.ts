@@ -1,16 +1,16 @@
 import { parse } from "csv-parse";
-import { CSVParserUtil } from "../util/csv-parser-util";
+import { CSVUtil } from "../util/csv-util";
 import { finished } from "stream/promises";
 
 
 export class CSVParser {
   constructor(
-    private readonly csvParserUtil: CSVParserUtil
+    private readonly csvUtil: CSVUtil
   ) { }
 
   async parseCSV(csvFilePath: string, fileCols: string[]) {
     let allColsData: any[] = []
-    const csvFileContent = this.csvParserUtil.readCSV(csvFilePath);
+    const csvFileContent = this.csvUtil.readCSV(csvFilePath);
     const parser = parse(
       csvFileContent,
       {

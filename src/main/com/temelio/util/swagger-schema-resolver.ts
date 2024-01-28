@@ -3,7 +3,7 @@ export class SwaggerSchemaResolver {
 
     resolve(propertySchema: any, propertyName: string, TSModels: Map<string, string>): string {
         const propertyType = propertySchema["type"];
-        const propertyFormat = propertySchema;
+        const propertyFormat = propertySchema["format"];
         const enums: string[] = propertySchema["enum"];
         const schemaRef: string = propertySchema["$ref"];
 
