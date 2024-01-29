@@ -38,11 +38,11 @@ class NonProfitsUploader {
     constructor(csvParser, httpUtil) {
         this.csvParser = csvParser;
         this.httpUtil = httpUtil;
-        this.BASE_ENDPOINT_URL = "http://localhost:8080/nonprofits";
+        this.ENDPOINT_BASE_URL = "http://localhost:8080/nonprofits";
         // token should never be kept in codebase - should be in some key store DB or secrets vault.
         this.BEARER_TOKEN = "eyJhbGciOiJSUzI1NiIsImprdSI6Imh0dHBzOi8vYXN5bmMtb25ib2FyZGluZy1rci03N2kyZW5hbC5hdXRoZW50aWNhdGlvbi5zYXAuaGFuYS5vbmRlbWFuZC5jb20vdG9rZW5fa2V5cyIsImtpZCI6ImRlZmF1bHQtand0LWtleS0tODMzNjczNTMyIiwidHlwIjoiSldUIn0";
-        this.nonProfitsCSVFilePath = "/Users/I511589/Desktop/Projects/Temelio Application/src/main/com/temelio/assets/nonprofit_data.csv";
-        this.grandSubmissionsCSVFilePath = "/Users/I511589/Desktop/Projects/Temelio Application/src/main/com/temelio/assets/nonprofit_submission_data.csv";
+        this.nonProfitsCSVFilePath = "../assets/nonprofit_data.csv";
+        this.grandSubmissionsCSVFilePath = "../assets/nonprofit_submission_data.csv";
         // csv header cols
         this.grandSubmissionsCols = [
             "Nonprofit Legal Name",
@@ -166,22 +166,22 @@ class NonProfitsUploader {
                     console.log("Grand Submissions data upload failed. More details:" + e);
                 }
             }
-            console.log("SUCCESS!!!! Updated all Non profits :", nonProfitsInServer);
+            console.log("SUCCESS !!! Uploaded all non profits data into the temelio server :)");
         });
     }
     addNonProfit(nonProfit) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.httpUtil.executeWithPayload(this.BASE_ENDPOINT_URL, "POST", nonProfit, this.BEARER_TOKEN);
+            return yield this.httpUtil.executeWithPayload(this.ENDPOINT_BASE_URL, "POST", nonProfit, this.BEARER_TOKEN);
         });
     }
     getNonProfits() {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.httpUtil.execute(this.BASE_ENDPOINT_URL, "GET", this.BEARER_TOKEN);
+            return yield this.httpUtil.execute(this.ENDPOINT_BASE_URL, "GET", this.BEARER_TOKEN);
         });
     }
     addGrandSubmission(grandSubmission, nonProfitId) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.httpUtil.executeWithPayload(this.BASE_ENDPOINT_URL + "/" + nonProfitId + "/submissions", "POST", grandSubmission, this.BEARER_TOKEN);
+            return yield this.httpUtil.executeWithPayload(this.ENDPOINT_BASE_URL + "/" + nonProfitId + "/submissions", "POST", grandSubmission, this.BEARER_TOKEN);
         });
     }
 }

@@ -13,21 +13,19 @@ exports.CSVParser = void 0;
 const csv_parse_1 = require("csv-parse");
 const promises_1 = require("stream/promises");
 class CSVParser {
-    constructor(csvParserUtil) {
-        this.csvParserUtil = csvParserUtil;
+    constructor(csvUtil) {
+        this.csvUtil = csvUtil;
     }
     parseCSV(csvFilePath, fileCols) {
         return __awaiter(this, void 0, void 0, function* () {
             let allColsData = [];
-            const csvFileContent = this.csvParserUtil.readCSV(csvFilePath);
+            const csvFileContent = this.csvUtil.readCSV(csvFilePath);
             const parser = (0, csv_parse_1.parse)(csvFileContent, {
                 delimiter: ",",
                 columns: fileCols,
                 fromLine: 2,
                 relax_column_count: true,
-                cast: (columnValue, context) => {
-                    return columnValue;
-                },
+                cast: (columnValue) => columnValue
             }, (error, data) => {
                 if (error) {
                     console.error("Error reading CSV File" + csvFilePath + "More details:'" + error.message);
