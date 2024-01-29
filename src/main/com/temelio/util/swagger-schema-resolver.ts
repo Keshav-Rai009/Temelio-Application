@@ -2,7 +2,7 @@ export class SwaggerSchemaResolver {
     private readonly primitives = ["string", "number", "boolean"];
     private readonly complexSchemaProperties = ['oneOf', 'anyOf', 'allOf', 'not']
 
-    resolve(propertySchema: any, propertyName: string, TSModels: Map<string, string>): string {
+    resolve(propertySchema: any, propertyName: string, additionalTSTypes: string, TSModels: Map<string, string>): any {
         const propertyType = propertySchema["type"];
         const propertyFormat = propertySchema["format"];
         const enums: string[] = propertySchema["enum"];
@@ -10,43 +10,43 @@ export class SwaggerSchemaResolver {
 
         // enums has type - 'string' - a primitive
         if (enums) {
-            return this.resolveSwaggerEnums(propertyName.toUpperCase(), enums, TSModels)
+            return this.resolveSwaggerEnums(propertyName.toUpperCase(), enums, additionalTSTypes, TSModels)
         }
 
         if (this.isPrimitiveType(propertyType)) {
-            return propertyType;
+            return { propertyType, additionalTSTypes };
         }
 
         if (propertyType === "object") {
-            return this.resolveSwaggerObject(propertySchema, TSModels)
+            return this.resolveSwaggerObject(propertySchema, additionalTSTypes, TSModels)
         }
 
         if (propertyType === "array") {
-            return this.resolveSwaggerArray(propertyName, propertySchema, TSModels)
+            return this.resolveSwaggerArray(propertyName, propertySchema, additionalTSTypes, TSModels)
         }
 
         if (schemaRef) {
-            return this.resolveSwaggerRef(schemaRef);
+            return { propertyType: this.resolveSwaggerRef(schemaRef), additionalTSTypes };
         }
 
         if (propertyFormat === "int32" || propertyFormat === "double" || propertyFormat === "int64" || propertyType === 'integer') {
-            return 'number';
+            return { propertyType: "number", additionalTSTypes };
         }
 
         if (propertyFormat === "uuid") {
-            return "string";
+            return { propertyType: "string", additionalTSTypes };
         }
 
         if (propertyFormat === "date-time" || propertyFormat === "date") {
-            return "Date";
+            return { propertyType: "Date", additionalTSTypes };
         }
 
         const complexProperty = this.getComplexProperty(Object.keys(propertySchema))
         if (complexProperty) {
-            return this.resolveComplexSchema(propertyName, complexProperty, propertySchema, TSModels);
+            return { propertyType: this.resolveComplexSchema(propertyName, complexProperty, propertySchema, additionalTSTypes, TSModels), additionalTSTypes };
         }
 
-        return propertyType;
+        return { propertyType, additionalTSTypes };
     }
 
     private isPrimitiveType(type: string) {
@@ -61,34 +61,35 @@ export class SwaggerSchemaResolver {
         return properties.find(property => this.complexSchemaProperties.includes(property));
     }
 
-    private resolveSwaggerObject(schema: any, TSModels: Map<string, string>) {
+    private resolveSwaggerObject(schema: any, additionalTSTypes: string, TSModels: Map<string, string>) {
         const properties = schema["properties"];
         const propertyNames = Object.keys(properties);
         let objectModel = '{';
         propertyNames.forEach((property, i) => {
             const schema = properties[property as keyof typeof properties];
-            const modelType = this.resolve(schema, property, TSModels);
-            objectModel += (i < propertyNames.length - 1 ? ` ${property}:${modelType},` : ` ${property}:${modelType} `);
+            const { propertyType } = this.resolve(schema, property, additionalTSTypes, TSModels);
+            objectModel += (i < propertyNames.length - 1 ? ` ${property}:${propertyType},` : ` ${property}:${propertyType} `);
         })
         objectModel += '}';
-        return objectModel;
+        return { propertyType: objectModel, additionalTSTypes };
     }
 
-    private resolveSwaggerEnums(enumName: string, enums: Array<string>, TSModels: Map<string, string>) {
+    private resolveSwaggerEnums(enumName: string, enums: Array<string>, additionalTSTypes: string, TSModels: Map<string, string>) {
         let enumModel = `export enum ${enumName} {`;
         enums.forEach((e, j) => {
             enumModel += (j < enums.length - 1 ? ` ${e},` : ` ${e} `);
         })
         enumModel += `}`;
+        additionalTSTypes += enumModel;
         TSModels.set(enumName, enumModel);
-        return enumName;
+        return { propertyType: enumName, additionalTSTypes };
     }
 
-    private resolveSwaggerArray(propertyName: string, schema: any, TSModels: Map<string, string>) {
+    private resolveSwaggerArray(propertyName: string, schema: any, additionalTSTypes: string, TSModels: Map<string, string>) {
         const arrayItems = schema.items;
         const arrayType = arrayItems.type;
-        const resolvedType = this.resolve(arrayItems, propertyName, TSModels);
-        return arrayType === 'object' ? '[' + resolvedType + ']' : resolvedType + '[]';
+        const { propertyType } = this.resolve(arrayItems, propertyName, additionalTSTypes, TSModels);
+        return { propertyType: arrayType === 'object' ? '[' + propertyType + ']' : propertyType + '[]', additionalTSTypes };
     }
 
     private resolveSwaggerRef(schemaRef: string) {
@@ -97,7 +98,7 @@ export class SwaggerSchemaResolver {
         return referencedSchema;
     }
 
-    private resolveComplexSchema(propertyName: string, complexProperty: string, schema: any, TSModels: Map<string, string>) {
+    private resolveComplexSchema(propertyName: string, complexProperty: string, schema: any, additionalTSTypes: string, TSModels: Map<string, string>) {
         const complexSchemaItems = schema[complexProperty as keyof typeof schema];
         let complexType = ""
         switch (complexProperty) {
@@ -105,24 +106,24 @@ export class SwaggerSchemaResolver {
             case 'oneOf':
             case 'anyOf':
                 complexSchemaItems.forEach((complexItem: any, j: any) => {
-                    const type = this.resolve(complexItem, propertyName, TSModels);
-                    complexType += (j < complexSchemaItems.length - 1 ? ` ${type} | ` : ` ${type} `);
+                    const { propertyType } = this.resolve(complexItem, propertyName, additionalTSTypes, TSModels);
+                    complexType += (j < complexSchemaItems.length - 1 ? ` ${propertyType} | ` : ` ${propertyType} `);
                 });
                 return complexType;
 
             //T1 & T2
             case 'allOf':
                 complexSchemaItems.forEach((complexItem: any, j: any) => {
-                    const type = this.resolve(complexItem, propertyName, TSModels);
-                    complexType += (j < complexSchemaItems.length - 1 ? ` ${type} & ` : ` ${type} `);
+                    const { propertyType } = this.resolve(complexItem, propertyName, additionalTSTypes, TSModels);
+                    complexType += (j < complexSchemaItems.length - 1 ? ` ${propertyType} & ` : ` ${propertyType} `);
                 });
                 return complexType;
 
             // !(T1 | T2)
             case 'not':
                 complexSchemaItems.forEach((complexItem: any, j: any) => {
-                    const type = this.resolve(complexItem, propertyName, TSModels);
-                    complexType += (j < complexSchemaItems.length - 1 ? ` ${type} | ` : ` ${type} `);
+                    const { propertyType } = this.resolve(complexItem, propertyName, additionalTSTypes, TSModels);
+                    complexType += (j < complexSchemaItems.length - 1 ? ` ${propertyType} | ` : ` ${propertyType} `);
                 });
                 return '! (' + complexType + ')';
             default:

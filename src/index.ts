@@ -17,5 +17,6 @@ const TSModels = new SwaggerModel2TSModelGenerator(new SwaggerSchemaResolver()).
 const nonProfitsUploader = new NonProfitsUploader(new CSVParser(new CSVUtil()), new HTTPUtil());
 /**
 * Reads and parses the Non Profits and Grand submissions CSV file and uploads data into the Temelio Server
+* Authentication : Bearer token
 */
 //nonProfitsUploader.parseCSVAndUploadNonProfits();

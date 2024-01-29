@@ -25,12 +25,12 @@ export class SwaggerModel2TSModelGenerator {
 
     public async generateTSModels() {
         if (!this.isValidVersion(this.swaggerVersion)) {
-            console.log("ABORTING !!! Please provide a swagger file having version 3.0.x");
+            console.error("ABORTING !!! Please provide a swagger file having version 3.0.x");
             return;
         }
 
         if (!this.swaggerModels) {
-            console.log("ABORTING !!! Distorted swagger file.");
+            console.error("ABORTING !!! Distorted swagger file.");
             return;
         }
 
@@ -42,16 +42,17 @@ export class SwaggerModel2TSModelGenerator {
             const modelProperties = modelSchema.properties;
             const propertyNames = Object.keys(modelProperties);
             let TSModel = `export interface ${modelName} {`;
-
+            let additionalModels = '';
             propertyNames.forEach((property, i) => {
                 const propertySchema = modelProperties[property as keyof typeof modelProperties];
-                const propertyType = this.swaggerSchemaResolver.resolve(propertySchema, property, TSModels);
+                const { propertyType, additionalTSTypes } = this.swaggerSchemaResolver.resolve(propertySchema, property, additionalModels, TSModels);
                 TSModel += (i < propertyNames.length - 1 ? `  ${property}: ${propertyType},` : `  ${property}: ${propertyType} `);
+                additionalModels = additionalTSTypes;
             })
             TSModel += `}`;
             TSModels.set(modelName, TSModel);
             // creates TS Model classes for each schema property
-            fs.writeFileSync(this.TSModelDirPath + modelName + '1.ts', util.inspect(TSModel), 'utf-8');
+            fs.writeFileSync(this.TSModelDirPath + modelName + '1.ts', util.inspect(TSModel + '  ' + additionalModels), 'utf-8');
         }
 
         // stores all TS Model classes for each schema property
