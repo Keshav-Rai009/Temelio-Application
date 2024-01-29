@@ -51,7 +51,8 @@ export class SwaggerModel2TSModelGenerator {
             })
             TSModel += `}`;
             TSModels.set(modelName, TSModel);
-            // creates TS Model classes for each schema property
+            // creates TS Model classes for each schema property - appended '1' so that used models are not changed.
+            // usage - simple remove '' from the string and import appropriate files and use :) 
             fs.writeFileSync(this.TSModelDirPath + modelName + '1.ts', util.inspect(TSModel + '  ' + additionalModels), 'utf-8');
         }
 
