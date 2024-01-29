@@ -6,10 +6,11 @@ import { CSVUtil } from "./main/com/temelio/util/csv-util";
 import { HTTPUtil } from "./main/com/temelio/util/http-util";
 
 /**
- * Converts any swagger schema into typesafe Type Script local object models
- * Supported Swagger version - 3.0.2
- * Limitations: Excludes allOf, notOf, oneOf, not types
- * @return: A map of Type Script Models and stores in a text file
+ * Converts any swagger schema into typesafe TypeScript local object models
+ * Supported Swagger version - 3.0.x
+ * Limitations: On [allOf, not] types - <TS does not have equivalent types>
+ * @generates: TS Model class for each schema property and stores all TS Models in a text file <TSModel.txt>
+ * @return: A map of TypeScript Models 
 */
 const TSModels = new SwaggerModel2TSModelGenerator(new SwaggerSchemaResolver()).generateTSModels();
 
@@ -17,4 +18,4 @@ const nonProfitsUploader = new NonProfitsUploader(new CSVParser(new CSVUtil()), 
 /**
 * Reads and parses the Non Profits and Grand submissions CSV file and uploads data into the Temelio Server
 */
-nonProfitsUploader.parseCSVAndUploadNonProfits();
+//nonProfitsUploader.parseCSVAndUploadNonProfits();

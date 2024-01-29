@@ -396,6 +396,25 @@
             "type": "string",
             "description": "Postal Code",
             "example": 11002
+          },
+          "Dog": {
+            "not": [
+              {
+                "$ref": "#/components/schemas/Duration"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "bark": {
+                    "type": "boolean"
+                  },
+                  "breed": {
+                    "type": "string",
+                    "enum": ["Dingo", "Husky", "Retriever", "Shepherd"]
+                  }
+                }
+              }
+            ]
           }
         }
       },
