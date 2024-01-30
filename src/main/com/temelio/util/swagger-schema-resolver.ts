@@ -13,7 +13,7 @@ export class SwaggerSchemaResolver {
             return this.resolveSwaggerEnums(propertyName.toUpperCase(), enums, additionalTSTypes, TSModels)
         }
 
-        if (this.isPrimitiveType(propertyType)) {
+        if (this.isPrimitiveType(propertyType) && !propertyFormat) {
             return { propertyType, additionalTSTypes };
         }
 
