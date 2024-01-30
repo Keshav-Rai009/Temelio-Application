@@ -1,7 +1,7 @@
 import * as uuid from "uuid";
 import { NonProfit } from "../model/NonProfit";
 import { Address } from "../model/Address";
-import { Duration } from "../model/Duration"
+import { Duration } from "../model/Duration";
 import { GrandSubmission } from "../model/GrandSubmission";
 import { CSVParser } from "../parsers/csv-parser";
 import { HTTPUtil } from "../util/http-util";

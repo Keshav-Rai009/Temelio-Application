@@ -62,7 +62,10 @@ export class SwaggerSchemaResolver {
     }
 
     private resolveSwaggerObject(schema: any, additionalTSTypes: string, TSModels: Map<string, string>) {
-        const properties = schema["properties"];
+        const properties = schema["properties"] ? schema["properties"] : schema["additionalProperties"];
+        if (!properties) {
+            return { propertyType: '{}', additionalTSTypes }
+        }
         const propertyNames = Object.keys(properties);
         let objectModel = '{';
         propertyNames.forEach((property, i) => {

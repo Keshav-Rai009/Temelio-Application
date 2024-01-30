@@ -9,7 +9,7 @@ import { HTTPUtil } from "./main/com/temelio/util/http-util";
 /**
  * PROBLEM 1
  * Converts any swagger schema into typesafe TypeScript local object models
- * Supported Swagger version - 3.0.x
+ * Supported Swagger versions - 2.x or 3.0.x
  * Limitations: On [allOf, not] types - <TS does not have equivalent types>
  * @generates: TS Model class e.g.< Address1.ts > for each schema property in model directory and stores all TS Models in a text file <TSModel.txt> under assets
  * @return: A map of TypeScript Models 

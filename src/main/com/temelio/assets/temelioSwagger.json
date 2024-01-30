@@ -304,7 +304,8 @@
           "legalName": {
             "type": "string",
             "description": "Non Profit Name",
-            "example": "Girls in Tech"
+            "example": "Girls in Tech",
+            "pattern": "^[a-zA-Z0-9][A-Za-z0-9 _'@./#&+-]*$"
           },
           "EIN": {
             "type": "string",
@@ -344,11 +345,13 @@
           },
           "nonProfitName": {
             "type": "string",
-            "description": "Non profit legal name"
+            "description": "Non profit legal name",
+            "pattern": "^[a-zA-Z0-9][A-Za-z0-9 _'@./#&+-]*$"
           },
           "grandName": {
             "type": "string",
-            "description": "Grand submission name"
+            "description": "Grand submission name",
+            "pattern": "^[a-zA-Z0-9][A-Za-z0-9 _'@./#&+-]*$"
           },
           "requestedAmount": {
             "type": "string",
@@ -356,7 +359,7 @@
           },
           "awardedAmount": {
             "type": "string",
-            "description": "Awareded grand amount"
+            "description": "Awarded grand amount"
           },
           "grandType": {
             "type": "string",

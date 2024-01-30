@@ -6,16 +6,16 @@ import { SwaggerSchemaResolver } from "../util/swagger-schema-resolver";
 
 /**
  * Converts any swagger schema into typesafe TypeScript local object models
- * Supported Swagger version - 3.0.x
+ * Supported Swagger versions - 2.x or 3.0.x
  * Limitations: On [allOf, not] types - <TS does not have equivalent types>
  * @generates: TS Model class for each schema property and stores all TS Models in a text file <TSModel.txt>
  * @return: A map of TypeScript Models 
 */
 
 export class SwaggerModel2TSModelGenerator {
+    private readonly swaggerVersion = this.getSwaggerSemver(swaggerJson);
     // input JSON should never be distored by the script
-    private readonly swaggerModels = swaggerJson.components.schemas;
-    private readonly swaggerVersion = swaggerJson.openapi;
+    private readonly swaggerModels = this.getSwaggerModels(swaggerJson, this.swaggerVersion);
     private readonly TSModelsFilePath = "/Users/I511589/Desktop/Projects/Temelio Application/src/main/com/temelio/assets/TSModels.txt";
     private readonly TSModelDirPath = "/Users/I511589/Desktop/Projects/Temelio Application/src/main/com/temelio/model/";
 
@@ -40,8 +40,13 @@ export class SwaggerModel2TSModelGenerator {
         for (const modelName of modelNames) {
             const modelSchema = this.swaggerModels[modelName as keyof typeof this.swaggerModels];
             const modelProperties = modelSchema.properties;
-            const propertyNames = Object.keys(modelProperties);
             let TSModel = `export interface ${modelName} {`;
+
+            if (!modelProperties) {
+                return TSModel + ` }`;
+            }
+
+            const propertyNames = Object.keys(modelProperties);
             let additionalModels = '';
             propertyNames.forEach((property, i) => {
                 const propertySchema = modelProperties[property as keyof typeof modelProperties];
@@ -62,9 +67,23 @@ export class SwaggerModel2TSModelGenerator {
         return TSModels;
     }
 
+    private getSwaggerSemver(swaggerJson: any): string {
+        return swaggerJson.openapi ? swaggerJson.openapi : swaggerJson.swagger;
+    }
+
+    private getSwaggerModels(swaggerJson: any, swaggerSemver: string): any {
+        switch (this.getSwaggerSemver(swaggerJson)) {
+            case "2.0":
+                return swaggerJson.definitions;
+            default:
+                return swaggerJson.components.schemas
+        }
+    }
+
+    //Supported Swagger versions - 2.x or 3.0.x
     private isValidVersion(semver: string): boolean {
         if (!semver) return false;
-        const semverSplits = semver.split('.');
-        return semverSplits[0] === '3' && semverSplits[1] === '0' && parseInt(semverSplits[2]) >= 0;
+        const semverRegex = /[2-3]\d*[\.0-9]\d*(\.[0-99])*$/g
+        return semverRegex.test(semver);
     }
 }
